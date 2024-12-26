@@ -1,0 +1,6 @@
+# Logs etc.
+logs
+
+# Virtual enviroment and not required files
+.venv
+tmp.py
