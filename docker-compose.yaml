@@ -116,6 +116,9 @@ services:
     restart: always
 
   airflow-webserver:
+    volumes:
+    - ./dags:/opt/airflow/dags
+    - ./src:/opt/airflow/src
     <<: *airflow-common
     command: webserver
     ports:
@@ -248,6 +251,8 @@ services:
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
 
   airflow-cli:
     <<: *airflow-common
