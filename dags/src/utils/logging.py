@@ -23,7 +23,7 @@ def log_notify(type, log_message):
             SELECT log_level
             FROM "LOGS".logging
             ORDER BY log_date DESC
-            LIMIT 4
+            LIMIT 3
             ''')
             has_error = False
             for row in result:

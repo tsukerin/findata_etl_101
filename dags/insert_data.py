@@ -23,7 +23,7 @@ default_args = {
 with DAG(dag_id='insert_data',
         default_args=default_args,
         description='Создание необходимых таблиц и загрузка в них данных',
-        template_searchpath='/src/',
+        template_searchpath='/dags/src/',
         schedule_interval='0 0 * * *',
         catchup=False
 ) as dag:

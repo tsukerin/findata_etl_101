@@ -1,6 +1,6 @@
 # Logs etc.
 logs
-dags/__pycache__
+__pycache__/
 
 # Virtual enviroment and not required files
 .venv

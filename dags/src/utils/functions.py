@@ -4,7 +4,7 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 def insert_into_ft_balance_f():
     try:
-        df = pd.read_csv(f'/src/files/ft_balance_f.csv', sep=';', encoding_errors='replace')
+        df = pd.read_csv(f'/dags/src/files/ft_balance_f.csv', sep=';', encoding_errors='replace')
 
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()
@@ -43,7 +43,7 @@ def insert_into_ft_balance_f():
 
 def insert_into_ft_posting_f():
     try:
-        df = pd.read_csv(f'/src/files/ft_posting_f.csv', sep=';', encoding_errors='replace')
+        df = pd.read_csv(f'/dags/src/files/ft_posting_f.csv', sep=';', encoding_errors='replace')
 
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()
@@ -61,7 +61,7 @@ def insert_into_ft_posting_f():
 
 def insert_into_md_account_d():
     try:
-        df = pd.read_csv(f'/src/files/md_account_d.csv', sep=';', encoding_errors='replace')
+        df = pd.read_csv(f'/dags/src/files/md_account_d.csv', sep=';', encoding_errors='replace')
 
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()
@@ -106,7 +106,7 @@ def insert_into_md_account_d():
 
 def insert_into_md_currency_d():
     try:
-        df = pd.read_csv(f'/src/files/md_currency_d.csv', sep=';', encoding_errors='replace')
+        df = pd.read_csv(f'/dags/src/files/md_currency_d.csv', sep=';', encoding_errors='replace')
         df['CODE_ISO_CHAR'] = df['CODE_ISO_CHAR'].apply(lambda x: 'NaN' if pd.isna(x) or len(x) != 3 else str(x))
         df['CURRENCY_CODE'] = df['CURRENCY_CODE'].fillna(0).astype(int)
 
@@ -148,7 +148,7 @@ def insert_into_md_currency_d():
 
 def insert_into_md_exchange_rate_d():
     try:
-        df = pd.read_csv(f'/src/files/md_exchange_rate_d.csv', sep=';', encoding_errors='replace')
+        df = pd.read_csv(f'/dags/src/files/md_exchange_rate_d.csv', sep=';', encoding_errors='replace')
 
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()
@@ -188,7 +188,7 @@ def insert_into_md_exchange_rate_d():
 
 def insert_into_md_ledger_account_s():
     try:
-        df = pd.read_csv(f'/src/files/md_ledger_account_s.csv', sep=';', encoding_errors='replace')
+        df = pd.read_csv(f'/dags/src/files/md_ledger_account_s.csv', sep=';', encoding_errors='replace')
 
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()
