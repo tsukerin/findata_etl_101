@@ -12,8 +12,7 @@ def insert_into_ft_balance_f():
         with engine.connect() as conn:
             conn.execute(
                 """
-                CREATE TEMP TABLE "TEMP_FT_BALANCE_F" AS
-                SELECT * FROM "DS"."FT_BALANCE_F";
+                CREATE TEMP TABLE "TEMP_FT_BALANCE_F" (LIKE "DS"."FT_BALANCE_F");
                 """)
 
             df.to_sql('TEMP_FT_BALANCE_F', conn, if_exists='append', index=False)
@@ -69,8 +68,7 @@ def insert_into_md_account_d():
         with engine.connect() as conn:
             conn.execute(
                 """
-                CREATE TEMP TABLE "TEMP_MD_ACCOUNT_D" AS
-                SELECT * FROM "DS"."MD_ACCOUNT_D";
+                CREATE TEMP TABLE "TEMP_MD_ACCOUNT_D" (LIKE "DS"."MD_ACCOUNT_D");
                 """)
 
             df.to_sql('TEMP_MD_ACCOUNT_D', conn, if_exists='append', index=False)
@@ -116,8 +114,7 @@ def insert_into_md_currency_d():
         with engine.connect() as conn:
             conn.execute(
                 """
-                CREATE TEMP TABLE "TEMP_MD_CURRENCY_D" AS
-                SELECT * FROM "DS"."MD_CURRENCY_D";
+                CREATE TEMP TABLE "TEMP_MD_CURRENCY_D" (LIKE "DS"."MD_CURRENCY_D");
                 """)
 
             df.to_sql('TEMP_MD_CURRENCY_D', conn, if_exists='append', index=False)
@@ -156,8 +153,7 @@ def insert_into_md_exchange_rate_d():
         with engine.connect() as conn:
             conn.execute(
                 """
-                CREATE TEMP TABLE "TEMP_MD_EXCHANGE_RATE_D" AS
-                SELECT * FROM "DS"."MD_EXCHANGE_RATE_D";
+                CREATE TEMP TABLE "TEMP_MD_EXCHANGE_RATE_D" (LIKE "DS"."MD_EXCHANGE_RATE_D");
                 """)
 
             df.to_sql('TEMP_MD_EXCHANGE_RATE_D', conn, if_exists='append', index=False)
@@ -165,7 +161,9 @@ def insert_into_md_exchange_rate_d():
             conn.execute(
                 """
                 MERGE INTO "DS"."MD_EXCHANGE_RATE_D" AS target
-                USING "TEMP_MD_EXCHANGE_RATE_D" AS source
+                USING (
+                SELECT DISTINCT * FROM "TEMP_MD_EXCHANGE_RATE_D"
+                ) AS source
                 ON target."DATA_ACTUAL_DATE" = source."DATA_ACTUAL_DATE" AND target."CURRENCY_RK" = source."CURRENCY_RK"
                 WHEN MATCHED THEN
                     UPDATE SET 
@@ -196,8 +194,7 @@ def insert_into_md_ledger_account_s():
         with engine.connect() as conn:
             conn.execute(
                 """
-                CREATE TEMP TABLE "TEMP_MD_LEDGER_ACCOUNT_S" AS
-                SELECT * FROM "DS"."MD_LEDGER_ACCOUNT_S";
+                CREATE TEMP TABLE "TEMP_MD_LEDGER_ACCOUNT_S" (LIKE "DS"."MD_LEDGER_ACCOUNT_S");
                 """)
 
             df.to_sql('TEMP_MD_LEDGER_ACCOUNT_S', conn, if_exists='append', index=False)
