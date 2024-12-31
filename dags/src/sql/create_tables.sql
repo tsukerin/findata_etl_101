@@ -72,3 +72,12 @@ CREATE TABLE IF NOT EXISTS "DS"."MD_LEDGER_ACCOUNT_S"(
     "IS_REVALUATION" VARCHAR(1),
     "IS_CORRECT" VARCHAR(1)
 );
+
+-- Создание схемы LOGS и таблицы logging
+CREATE SCHEMA IF NOT EXISTS "LOGS";
+
+CREATE TABLE IF NOT EXISTS "LOGS"."logging" (
+    log_level VARCHAR(10) DEFAULT "INFO" NOT NULL,
+    log_date DATE DEFAULT NOW() NOT NULL,
+    log_message TEXT
+)
