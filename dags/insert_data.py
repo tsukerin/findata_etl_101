@@ -1,7 +1,5 @@
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
-from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 import pandas as pd
@@ -9,7 +7,7 @@ from datetime import datetime
 import time
 
 from src.utils.logging import *
-from src.utils.functions import *
+from dags.src.utils.dm_funcs import *
 
 def dummy_load(seconds):
     time.sleep(seconds)
