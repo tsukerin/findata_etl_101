@@ -8,19 +8,19 @@ def log_error(table, error_message):
     with engine.connect() as conn:
         conn.execute(
             f"""
-                INSERT INTO "LOGS".LOGGING (log_level, log_date, log_message) 
+                INSERT INTO logs.logging (log_level, log_date, log_message) 
                 VALUES ('ERROR', '{datetime.now()}', 'Произошла ошибка в таблице {table}: {error_message}')
             """)
 
-def log_notify(type, log_message):
+def log_notify(log_type, log_message):
     postgres_hook = PostgresHook('local-postgres')
     engine = postgres_hook.get_sqlalchemy_engine()
     
     with engine.connect() as conn:
-        if type == 'SUCCESS':
+        if log_type == 'SUCCESS':
             result = conn.execute('''
             SELECT log_level
-            FROM "LOGS".logging
+            FROM logs.logging
             ORDER BY log_date DESC
             LIMIT 3
             ''')
@@ -30,14 +30,13 @@ def log_notify(type, log_message):
                     has_error = True
                     break
             if has_error:
-                type = 'FAILED'
+                log_type = 'FAILED'
                 log_message = 'При выполнении загрузки данных произошла ошибка!'
             else:
-                type = 'SUCCESS'
+                log_type = 'SUCCESS'
 
-        
         conn.execute(
             f"""
-            INSERT INTO "LOGS".LOGGING (log_level, log_date, log_message) 
-                VALUES ('{type}', '{datetime.now()}', '{log_message}')
+            INSERT INTO logs.logging (log_level, log_date, log_message) 
+                VALUES ('{log_type}', '{datetime.now()}', '{log_message}')
             """)

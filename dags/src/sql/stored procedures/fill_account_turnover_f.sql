@@ -1,58 +1,79 @@
-CREATE OR REPLACE PROCEDURE "DS".fill_account_turnover_f (i_ondate DATE) 
+CREATE OR REPLACE PROCEDURE dm.fill_account_turnover_f (i_ondate DATE) 
 LANGUAGE plpgsql
 AS 
 $$
 DECLARE 
-    curr_account_rk INTEGER;
-    credit_amount NUMERIC(23, 8) := 0;
-    credit_amount_rub NUMERIC(23, 8) := 0;
-    debet_amount NUMERIC(23, 8) := 0;
-    debet_amount_rub NUMERIC(23, 8) := 0;
+    accounts_cur CURSOR FOR (
+            SELECT 
+                credit_account_rk AS accounts
+            FROM ds.ft_posting_f
+            WHERE oper_date = i_ondate 
+            UNION 
+            SELECT 
+                debet_account_rk AS accounts
+            FROM ds.ft_posting_f
+            WHERE oper_date = i_ondate
+        );
+
+    curr_account INTEGER;
+    p_credit_amount NUMERIC(23, 8) := 0;
+    p_credit_amount_rub NUMERIC(23, 8) := 0;
+    p_debet_amount NUMERIC(23, 8) := 0;
+    p_debet_amount_rub NUMERIC(23, 8) := 0;
     actual_course FLOAT := 1;
 BEGIN
-    -- Находим идентификатор счета
-    SELECT COALESCE("CREDIT_ACCOUNT_RK", 0)
-    INTO curr_account_rk
-    FROM "DS"."FT_POSTING_F"
-    WHERE "OPER_DATE" = i_ondate;
+    OPEN accounts_cur;
 
-    -- Находим сумму проводок за дату расчета для CREDIT
-    SELECT COALESCE("CREDIT_AMOUNT", 0)
-    INTO credit_amount
-    FROM "DS"."FT_POSTING_F"
-    WHERE "OPER_DATE" = i_ondate;
+    LOOP
+        FETCH accounts_cur INTO curr_account;
+        EXIT WHEN NOT FOUND;
 
-    -- Находим актуальный курс
-    SELECT COALESCE("REDUCED_COURCE", 1)
-    INTO actual_course
-    FROM "DS"."MD_EXCHANGE_RATE_D" 
-    WHERE i_ondate BETWEEN "DATA_ACTUAL_DATE" AND "DATA_ACTUAL_END_DATE";
+        -- Находим актуальный курс
+        SELECT COALESCE(MAX(reduced_cource), 1)
+		INTO actual_course
+		FROM ds.md_exchange_rate_d
+		WHERE currency_rk = curr_account
+        AND i_ondate BETWEEN data_actual_date AND data_actual_end_date;
+            
+        -- Находим сумму проводок за дату расчета для CREDIT
+        SELECT COALESCE(SUM(credit_amount), 0)
+        INTO p_credit_amount
+        FROM ds.ft_posting_f
+        WHERE credit_account_rk = curr_account
+          AND oper_date = i_ondate;
 
-    -- Находим сумму проводок за дату расчета в рублях для CREDIT
-    SELECT COALESCE("CREDIT_AMOUNT" * actual_course, 0)
-    INTO credit_amount_rub
-    FROM "DS"."FT_POSTING_F"
-    WHERE "OPER_DATE" = i_ondate;
+        -- Находим сумму проводок за дату расчета в рублях для CREDIT
+        p_credit_amount_rub := p_credit_amount * actual_course;
+        
+        -- Находим сумму проводок за дату расчета для DEBET
+        SELECT COALESCE(SUM(debet_amount), 0)
+        INTO p_debet_amount
+        FROM ds.ft_posting_f
+        WHERE debet_account_rk = curr_account
+          AND oper_date = i_ondate;
 
-    -- Проделываем то же самое для DEBET
-    SELECT COALESCE("DEBET_AMOUNT", 0)
-    INTO debet_amount
-    FROM "DS"."FT_POSTING_F"
-    WHERE "OPER_DATE" = i_ondate;
+        -- Находим сумму проводок за дату расчета в рублях для DEBET
+        p_debet_amount_rub := p_debet_amount * actual_course;
 
-    SELECT COALESCE("DEBET_AMOUNT" * actual_course, 0)
-    INTO debet_amount_rub
-    FROM "DS"."FT_POSTING_F"
-    WHERE "OPER_DATE" = i_ondate;
+        -- Проверяем, нашлись ли все проводки за указанную дату
+        IF p_credit_amount IS NOT NULL 
+            AND p_credit_amount_rub IS NOT NULL 
+            AND p_debet_amount IS NOT NULL 
+            AND p_debet_amount_rub IS NOT NULL
+        THEN
+            -- Вставляем данные в итоговую таблицу
+            INSERT INTO dm.dm_account_turnover_f VALUES (
+                i_ondate,
+                curr_account,
+                p_credit_amount,
+                p_credit_amount_rub,
+                p_debet_amount,
+                p_debet_amount_rub
+            );
+        END IF;
 
-    -- Вставляем данные в итоговую таблицу
-    INSERT INTO "DM"."DM_ACCOUNT_TURNOVER_F" VALUES (
-        i_ondate,
-        curr_account_rk,
-        credit_amount,
-        credit_amount_rub,
-        debet_amount,
-        debet_amount_rub
-    );
+    END LOOP;
+
+    CLOSE accounts_cur;
 END;
 $$;

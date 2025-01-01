@@ -3,11 +3,11 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 
 from src.utils.logging import *
-from dags.src.utils.dm_funcs import *
+from src.utils.ds_funcs import *
 
 def dummy_load(seconds):
     time.sleep(seconds)
@@ -26,6 +26,12 @@ with DAG(dag_id='insert_data',
         catchup=False
 ) as dag:
 
+    dag_init = SQLExecuteQueryOperator(
+        task_id='dag_init',
+        conn_id='local-postgres',
+        sql='sql/ddl_scripts/create_logs_table.sql',
+    )
+
     start_task = PythonOperator(
         task_id='start_task',
         python_callable=log_notify,
@@ -35,7 +41,7 @@ with DAG(dag_id='insert_data',
     create_tables = SQLExecuteQueryOperator(
         task_id='create_tables',
         conn_id='local-postgres',
-        sql='sql/create_tables.sql',
+        sql='sql/ddl_scripts/create_tables_dds.sql',
     )
 
     loading = PythonOperator(
@@ -92,4 +98,4 @@ with DAG(dag_id='insert_data',
         op_args=['SUCCESS', 'Загрузка данных успешно завершена!']
     )
 
-    start_task >> create_tables >> loading >>  tables_created >> loading2 >> [ft_balance_f, ft_posting_f, md_account_d, md_currency_d, md_exchange_rate_d, md_ledger_account_s] >> end_task
+    dag_init >> start_task >> create_tables >> loading >> tables_created >> loading2 >> [ft_balance_f, ft_posting_f, md_account_d, md_currency_d, md_exchange_rate_d, md_ledger_account_s] >> end_task
