@@ -56,10 +56,10 @@ BEGIN
         p_debet_amount_rub := p_debet_amount * actual_course;
 
         -- Проверяем, нашлись ли все проводки за указанную дату
-        IF p_credit_amount IS NOT NULL 
-            AND p_credit_amount_rub IS NOT NULL 
-            AND p_debet_amount IS NOT NULL 
-            AND p_debet_amount_rub IS NOT NULL
+        IF p_credit_amount > 0 
+            AND p_credit_amount_rub > 0 
+            AND p_debet_amount > 0 
+            AND p_debet_amount_rub > 0
         THEN
             -- Вставляем данные в итоговую таблицу
             INSERT INTO dm.dm_account_turnover_f VALUES (
