@@ -7,9 +7,9 @@ DECLARE
             SELECT 
                 credit_account_rk AS accounts
             FROM ds.ft_posting_f
-            WHERE oper_date = i_ondate 
-            UNION 
-            SELECT 
+            WHERE oper_date = i_ondate
+            UNION
+            SELECT
                 debet_account_rk AS accounts
             FROM ds.ft_posting_f
             WHERE oper_date = i_ondate
@@ -31,9 +31,11 @@ BEGIN
         -- Находим актуальный курс
         SELECT COALESCE(MAX(reduced_cource), 1)
 		INTO actual_course
-		FROM ds.md_exchange_rate_d
-		WHERE currency_rk = curr_account
-        AND i_ondate BETWEEN data_actual_date AND data_actual_end_date;
+		FROM ds.md_exchange_rate_d d
+        JOIN ds.ft_balance_f f 
+            ON f.currency_rk = d.currency_rk
+		WHERE curr_account = f.account_rk
+            AND i_ondate BETWEEN data_actual_date AND data_actual_end_date;
             
         -- Находим сумму проводок за дату расчета для CREDIT
         SELECT COALESCE(SUM(credit_amount), 0)
