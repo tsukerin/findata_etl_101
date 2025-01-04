@@ -22,7 +22,7 @@ def log_ds_notify(log_type, log_message):
         if log_type == 'SUCCESS':
             result = conn.execute('''
             SELECT log_level
-            FROM logs.logging
+            FROM logs.logs_ds
             ORDER BY log_date DESC
             LIMIT 3
             ''')
@@ -64,7 +64,7 @@ def log_dm_notify(log_type, log_message):
         if log_type == 'SUCCESS':
             result = conn.execute('''
             SELECT log_level
-            FROM logs.logging
+            FROM logs.logs_dm
             ORDER BY log_date DESC
             LIMIT 3
             ''')
