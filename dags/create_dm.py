@@ -87,7 +87,7 @@ with DAG(
 
     end_task = PythonOperator(
         task_id='end_task',
-        python_callable=log_ds_notify,
+        python_callable=log_dm_notify,
         op_args=['SUCCESS', 'Расчет витрин данных выполнен успешно!']
     )
 

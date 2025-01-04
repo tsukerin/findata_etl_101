@@ -2,7 +2,6 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 from src.utils.logging import *
 
 def exec_procedure_fill_account_turnover_f(year, month, days):
-    
     try:
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()

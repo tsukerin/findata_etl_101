@@ -7,7 +7,7 @@ def insert_into_ft_balance_f():
         df = pd.read_csv(f'/dags/src/files/ft_balance_f.csv', sep=';', encoding_errors='replace')
         df.columns = df.columns.str.lower()
 
-        postgres_hook = PostgresHook('local-postgres')
+        postgres_hook = PostgresHook('local-postgres', options={'autocommit': True})
         engine = postgres_hook.get_sqlalchemy_engine()
 
         with engine.connect() as conn:

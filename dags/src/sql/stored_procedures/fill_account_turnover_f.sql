@@ -30,13 +30,13 @@ BEGIN
 
         -- Находим актуальный курс
         SELECT COALESCE(MAX(reduced_cource), 1)
-		INTO actual_course
-		FROM ds.md_exchange_rate_d d
-        JOIN ds.ft_balance_f f 
-            ON f.currency_rk = d.currency_rk
-		WHERE curr_account = f.account_rk
-            AND i_ondate BETWEEN data_actual_date AND data_actual_end_date;
-            
+        INTO actual_course
+        FROM ds.md_exchange_rate_d d
+        WHERE d.currency_rk IN (
+            SELECT currency_rk FROM ds.ft_balance_f WHERE account_rk = curr_account
+        )
+        AND i_ondate BETWEEN data_actual_date AND data_actual_end_date;
+                
         -- Находим сумму проводок за дату расчета для CREDIT
         SELECT COALESCE(SUM(credit_amount), 0)
         INTO p_credit_amount
@@ -46,7 +46,7 @@ BEGIN
 
         -- Находим сумму проводок за дату расчета в рублях для CREDIT
         p_credit_amount_rub := p_credit_amount * actual_course;
-        
+            
         -- Находим сумму проводок за дату расчета для DEBET
         SELECT COALESCE(SUM(debet_amount), 0)
         INTO p_debet_amount
@@ -57,19 +57,15 @@ BEGIN
         -- Находим сумму проводок за дату расчета в рублях для DEBET
         p_debet_amount_rub := p_debet_amount * actual_course;
 
-        -- Проверяем, нашлись ли все проводки за указанную дату
-        IF p_credit_amount > 0 
-            AND p_credit_amount_rub > 0 
-            AND p_debet_amount > 0 
-            AND p_debet_amount_rub > 0
-        THEN
+        -- Проверяем, нашлись ли проводки за указанную дату
+        IF p_credit_amount > 0 AND p_debet_amount > 0 THEN
             -- Вставляем данные в итоговую таблицу
             INSERT INTO dm.dm_account_turnover_f VALUES (
-                i_ondate,
-                curr_account,
-                p_credit_amount,
-                p_credit_amount_rub,
-                p_debet_amount,
+                i_ondate, 
+                curr_account, 
+                p_credit_amount, 
+                p_credit_amount_rub, 
+                p_debet_amount, 
                 p_debet_amount_rub
             );
         END IF;
@@ -77,5 +73,14 @@ BEGIN
     END LOOP;
 
     CLOSE accounts_cur;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        INSERT INTO dm.logs_dm VALUES (
+            'ERROR', 
+            NOW(), 
+            'dm.fill_account_turnover_f: ' || SQLERRM
+        );
+        RAISE;
 END;
 $$;
