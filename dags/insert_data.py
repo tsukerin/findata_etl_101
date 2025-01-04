@@ -34,7 +34,7 @@ with DAG(dag_id='insert_data',
 
     start_task = PythonOperator(
         task_id='start_task',
-        python_callable=log_notify,
+        python_callable=log_ds_notify,
         op_args=['INFO', 'Началось импортирование данных. Создание таблиц...']
     )
 
@@ -52,7 +52,7 @@ with DAG(dag_id='insert_data',
 
     tables_created = PythonOperator(
         task_id='tables_created',
-        python_callable=log_notify,
+        python_callable=log_ds_notify,
         op_args=['INFO', 'Таблицы созданы успешно. Импортирование данных...']
     )
 
@@ -94,7 +94,7 @@ with DAG(dag_id='insert_data',
 
     end_task = PythonOperator(
         task_id='end_task',
-        python_callable=log_notify,
+        python_callable=log_ds_notify,
         op_args=['SUCCESS', 'Загрузка данных успешно завершена!']
     )
 

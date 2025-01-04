@@ -38,7 +38,7 @@ def insert_into_ft_balance_f():
             
             conn.execute(f'DROP TABLE temp_ft_balance_f;')
     except Exception as e:
-        log_error('ft_balance_f', str(e))
+        log_ds_error('ft_balance_f', str(e))
 
 def insert_into_ft_posting_f():
     try:
@@ -57,7 +57,7 @@ def insert_into_ft_posting_f():
             
             df.to_sql('ft_posting_f', conn, schema='ds', if_exists='append', index=False)
     except Exception as e:
-        log_error('ft_posting_f', str(e))
+        log_ds_error('ft_posting_f', str(e))
 
 def insert_into_md_account_d():
     try:
@@ -101,7 +101,7 @@ def insert_into_md_account_d():
             
             conn.execute(f'DROP TABLE temp_md_account_d;')
     except Exception as e:
-        log_error('ft_balance_f', str(e))
+        log_ds_error('ft_balance_f', str(e))
 
 def insert_into_md_currency_d():
     try:
@@ -143,7 +143,7 @@ def insert_into_md_currency_d():
             
             conn.execute(f'DROP TABLE temp_md_currency_d;')
     except Exception as e:
-        log_error('md_currency_d', str(e))
+        log_ds_error('md_currency_d', str(e))
 
 def insert_into_md_exchange_rate_d():
     try:
@@ -185,13 +185,13 @@ def insert_into_md_exchange_rate_d():
             
             conn.execute(f'DROP TABLE temp_md_exchange_rate_d;')
     except Exception as e:
-        log_error('md_exchange_rate_d', str(e))
+        log_ds_error('md_exchange_rate_d', str(e))
 
 def insert_into_md_ledger_account_s():
     try:
         df = pd.read_csv(f'/dags/src/files/md_ledger_account_s.csv', sep=';', encoding_errors='replace')
         df.columns = df.columns.str.lower()
-        
+
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()
 
@@ -271,4 +271,4 @@ def insert_into_md_ledger_account_s():
             
             conn.execute(f'DROP TABLE temp_md_ledger_account_s;')
     except Exception as e:
-        log_error('md_ledger_account_s', str(e))
+        log_ds_error('md_ledger_account_s', str(e))
