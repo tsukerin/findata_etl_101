@@ -1,6 +1,7 @@
 # Logs etc.
 logs
 __pycache__/
+.DS_Store/
 
 # Virtual enviroment and not required files
 .venv
