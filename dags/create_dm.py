@@ -61,7 +61,19 @@ with DAG(
         op_args=[5]
     )
 
-    fill_account_turnover_f = SQLExecuteQueryOperator(
+    create_fill_account_turnover_f = SQLExecuteQueryOperator(
+        task_id='fill_account_turnover_f',
+        conn_id='local-postgres',
+        sql='sql/stored_procedures/fill_account_turnover_f.sql',
+    )
+
+    create_fill_account_by_balance_f = SQLExecuteQueryOperator(
+        task_id='fill_account_turnover_f',
+        conn_id='local-postgres',
+        sql='sql/stored_procedures/fill_account_turnover_f.sql',
+    )
+
+    create_fill_account_turnover_f = SQLExecuteQueryOperator(
         task_id='fill_account_turnover_f',
         conn_id='local-postgres',
         sql='sql/stored_procedures/fill_account_turnover_f.sql',
@@ -79,10 +91,16 @@ with DAG(
         op_args=[5]
     )
 
-    calc_dm = PythonOperator(
-        task_id='calc_dm',
+    fill_account_turnover_f = PythonOperator(
+        task_id='fill_account_turnover_f',
         python_callable=exec_procedure_fill_account_turnover_f,
         op_args=[2018, 1, 31] 
+    )
+
+    fill_account_by_balance_f = SQLExecuteQueryOperator(
+        task_id='fill_account_turnover_f',
+        conn_id='local-postgres',
+        sql='CALL dm.fill_account_by_balance_f ("2017-12-31");',
     )
 
     end_task = PythonOperator(
@@ -91,4 +109,4 @@ with DAG(
         op_args=['SUCCESS', 'Расчет витрин данных выполнен успешно!']
     )
 
-    dag_init >> start_task >> loading >> create_tables >> tables_created >> loading2 >> fill_account_turnover_f >> stored_procedures_created >> loading3 >> calc_dm >> end_task
+    dag_init >> start_task >> loading >> create_tables >> tables_created >> loading2 >> create_fill_account_turnover_f >> stored_procedures_created >> loading3 >> fill_account_turnover_f >> end_task

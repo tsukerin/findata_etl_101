@@ -4,6 +4,8 @@ import time
 
 def exec_procedure_fill_account_turnover_f(year, month, days):
     try:
+        log_dm_notify('INFO', 'Расчет витрины dm_account_turnover_f')
+
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()
 
