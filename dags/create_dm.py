@@ -78,12 +78,6 @@ with DAG(
         op_args=['INFO', 'Процедуры созданы. Идет расчет витрин...']
     )
 
-    loading3 = PythonOperator(
-        task_id='loading3',
-        python_callable=dummy_load,
-        op_args=[5]
-    )
-
     fill_account_turnover_f = PythonOperator(
         task_id='fill_account_turnover_f',
         python_callable=exec_procedure_fill_account_turnover_f,
@@ -102,4 +96,4 @@ with DAG(
         op_args=['SUCCESS', 'Расчет витрин данных выполнен успешно!']
     )
 
-    dag_init >> start_task >> loading >> create_tables >> tables_created >> loading2 >> create_fill_account_turnover_f >> create_fill_account_balance_f >> stored_procedures_created >> loading3 >> fill_account_turnover_f >> fill_account_balance_f >> end_task
+    dag_init >> start_task >> loading >> create_tables >> tables_created >> loading2 >> create_fill_account_turnover_f >> create_fill_account_balance_f >> stored_procedures_created >> fill_account_turnover_f >> fill_account_balance_f >> end_task
