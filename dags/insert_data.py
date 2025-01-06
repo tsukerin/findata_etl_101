@@ -14,8 +14,7 @@ def dummy_load(seconds):
 
 default_args = {
     'owner': 'tsukerin',
-    'start_date': datetime.now(),
-    'retries': 2
+    'start_date': datetime.now()
 }
 
 with DAG(dag_id='insert_data',

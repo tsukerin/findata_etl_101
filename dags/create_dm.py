@@ -13,8 +13,7 @@ def dummy_load(seconds):
 
 default_args = {
     'owner': 'tsukerin',
-    'start_date': datetime.now(),
-    'retries': 2
+    'start_date': datetime.now()
 }
 
 with DAG(
@@ -62,21 +61,15 @@ with DAG(
     )
 
     create_fill_account_turnover_f = SQLExecuteQueryOperator(
-        task_id='fill_account_turnover_f',
+        task_id='create_fill_account_turnover_f',
         conn_id='local-postgres',
         sql='sql/stored_procedures/fill_account_turnover_f.sql',
     )
 
-    create_fill_account_by_balance_f = SQLExecuteQueryOperator(
-        task_id='fill_account_turnover_f',
+    create_fill_account_balance_f = SQLExecuteQueryOperator(
+        task_id='create_fill_account_balance_f',
         conn_id='local-postgres',
-        sql='sql/stored_procedures/fill_account_turnover_f.sql',
-    )
-
-    create_fill_account_turnover_f = SQLExecuteQueryOperator(
-        task_id='fill_account_turnover_f',
-        conn_id='local-postgres',
-        sql='sql/stored_procedures/fill_account_turnover_f.sql',
+        sql='sql/stored_procedures/fill_account_balance_f.sql',
     )
 
     stored_procedures_created = PythonOperator(
@@ -97,10 +90,10 @@ with DAG(
         op_args=[2018, 1, 31] 
     )
 
-    fill_account_by_balance_f = SQLExecuteQueryOperator(
-        task_id='fill_account_turnover_f',
-        conn_id='local-postgres',
-        sql='CALL dm.fill_account_by_balance_f ("2017-12-31");',
+    fill_account_balance_f = PythonOperator(
+        task_id='fill_account_balance_f',
+        python_callable=exec_procedure_fill_account_balance_f,
+        op_args=[2018, 1, 31] 
     )
 
     end_task = PythonOperator(
@@ -109,4 +102,4 @@ with DAG(
         op_args=['SUCCESS', 'Расчет витрин данных выполнен успешно!']
     )
 
-    dag_init >> start_task >> loading >> create_tables >> tables_created >> loading2 >> create_fill_account_turnover_f >> stored_procedures_created >> loading3 >> fill_account_turnover_f >> end_task
+    dag_init >> start_task >> loading >> create_tables >> tables_created >> loading2 >> create_fill_account_turnover_f >> create_fill_account_balance_f >> stored_procedures_created >> loading3 >> fill_account_turnover_f >> fill_account_balance_f >> end_task
