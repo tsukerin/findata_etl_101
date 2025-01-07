@@ -58,7 +58,7 @@ BEGIN
         p_debet_amount_rub := p_debet_amount * actual_course;
 
         -- Проверяем, нашлись ли проводки за указанную дату
-        IF p_credit_amount > 0 AND p_debet_amount > 0 THEN
+        IF p_credit_amount > 0 OR p_debet_amount > 0 THEN
             -- Вставляем данные в итоговую таблицу
             INSERT INTO dm.dm_account_turnover_f VALUES (
                 i_ondate, 
