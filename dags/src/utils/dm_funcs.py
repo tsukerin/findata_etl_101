@@ -38,55 +38,58 @@ def exec_procedure_fill_account_balance_f(year, month, days):
     except Exception as e:
         log_dm_error('fill_account_balance_f', str(e))
 
+import pandas as pd
+from airflow.hooks.postgres_hook import PostgresHook
+
 def export_f101_round_f():
     try:
         postgres_hook = PostgresHook('local-postgres')
         engine = postgres_hook.get_sqlalchemy_engine()
 
-        with engine.connect() as conn:
-            data = conn.execute('''
-                SELECT 
-                    from_date,
-                    to_date,
-                    chapter,
-                    ledger_account,
-                    characteristic, 
-                    balance_in_rub, 
-                    r_balance_in_rub, 
-                    balance_in_val, 
-                    r_balance_in_val, 
-                    balance_in_total, 
-                    r_balance_in_total, 
-                    turn_deb_rub, 
-                    r_turn_deb_rub, 
-                    turn_deb_val, 
-                    r_turn_deb_val, 
-                    turn_deb_total, 
-                    r_turn_deb_total, 
-                    turn_cre_rub, 
-                    r_turn_cre_rub, 
-                    turn_cre_val, 
-                    r_turn_cre_val, 
-                    turn_cre_total, 
-                    r_turn_cre_total, 
-                    balance_out_rub, 
-                    r_balance_out_rub, 
-                    balance_out_val, 
-                    r_balance_out_val, 
-                    balance_out_total,
-                    r_balance_out_total
-                FROM dm.dm_f101_round_f
-                ''')
-            
-            df = pd.read_sql(data, conn)
+        query = '''
+            SELECT 
+                from_date,
+                to_date,
+                chapter,
+                ledger_account,
+                characteristic, 
+                balance_in_rub, 
+                r_balance_in_rub, 
+                balance_in_val, 
+                r_balance_in_val, 
+                balance_in_total, 
+                r_balance_in_total, 
+                turn_deb_rub, 
+                r_turn_deb_rub, 
+                turn_deb_val, 
+                r_turn_deb_val, 
+                turn_deb_total, 
+                r_turn_deb_total, 
+                turn_cre_rub, 
+                r_turn_cre_rub, 
+                turn_cre_val, 
+                r_turn_cre_val, 
+                turn_cre_total, 
+                r_turn_cre_total, 
+                balance_out_rub, 
+                r_balance_out_rub, 
+                balance_out_val, 
+                r_balance_out_val, 
+                balance_out_total,
+                r_balance_out_total
+            FROM dm.dm_f101_round_f
+        '''
 
-            df.to_csv('dags/src/files/f101_round_f.csv', index=False)
+        df = pd.read_sql(query, con=engine)
+
+        df.to_csv('dags/src/files/f101_round_f.csv', index=False)
+
     except Exception as e:
-        log_dm_error('Ошибка при экспорте dm_f101_round_f', str(e))
+        log_export_error('dm_f101_round_f', str(e))
 
 def insert_into_f101_round_f():
     try:
-        df = pd.read_csv(f'/dags/src/files/f101_round_f.csv', sep=';', encoding_errors='replace')
+        df = pd.read_csv(f'/dags/src/files/f101_round_f.csv', sep=',', encoding_errors='replace')
         df.columns = df.columns.str.lower()
 
         postgres_hook = PostgresHook('local-postgres', options={'autocommit': True})
@@ -95,15 +98,15 @@ def insert_into_f101_round_f():
         with engine.connect() as conn:
             conn.execute(
                 """
-                CREATE TEMP TABLE temp_f101_round_f (LIKE dm.f101_round_f);
+                CREATE TEMP TABLE temp_dm_f101_round_f (LIKE dm.dm_f101_round_f);
                 """)
 
-            df.to_sql('temp_f101_round_f', conn, if_exists='append', index=False)
+            df.to_sql('temp_dm_f101_round_f', conn, if_exists='append', index=False)
 
             conn.execute(
                 """
-                MERGE INTO dm.f101_round_f AS target
-                USING temp_f101_round_f AS source
+                MERGE INTO dm.dm_f101_round_f AS target
+                USING temp_dm_f101_round_f AS source
                 ON target.from_date = source.from_date 
                     AND target.to_date = source.to_date
                     AND target.ledger_account = source.ledger_account
@@ -168,6 +171,6 @@ def insert_into_f101_round_f():
                         source.r_balance_out_total
                     );
                 """)
-            conn.execute(f'DROP TABLE temp_f101_round_f;')
+            conn.execute(f'DROP TABLE temp_dm_f101_round_f;')
     except Exception as e:
-        log_ds_error('f101_round_f', str(e))
+        log_ds_error('dm_f101_round_f', str(e))

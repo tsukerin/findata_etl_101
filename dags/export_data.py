@@ -32,7 +32,7 @@ with DAG(
 
     start_task = PythonOperator(
         task_id='start_task',
-        python_callable=log_dm_notify,
+        python_callable=log_export_notify,
         op_args=['INFO', 'Начался экспорт витрины в CSV таблицу...']
     )
 
@@ -49,7 +49,7 @@ with DAG(
 
     end_task = PythonOperator(
         task_id='end_task',
-        python_callable=log_dm_notify,
+        python_callable=log_export_notify,
         op_args=['SUCCESS', 'Экспорт в CSV выполнен успешно! Файл находится в директории: /dags/src/files']
     )
 

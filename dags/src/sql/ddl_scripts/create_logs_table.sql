@@ -13,3 +13,9 @@ CREATE TABLE IF NOT EXISTS logs.logs_dm (
     log_date TIMESTAMP DEFAULT NOW() NOT NULL,
     log_message TEXT
 );
+
+CREATE TABLE IF NOT EXISTS logs.logs_export (
+    log_level VARCHAR(10) DEFAULT 'INFO' NOT NULL,
+    log_date TIMESTAMP DEFAULT NOW() NOT NULL,
+    log_message TEXT
+);
