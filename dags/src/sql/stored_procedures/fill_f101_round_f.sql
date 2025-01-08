@@ -47,97 +47,97 @@ BEGIN
         FROM ds.md_account_d
         WHERE SUBSTRING(account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(balance_out_rub)
+        SELECT COALESCE(SUM(balance_out_rub), 0)
         INTO p_balance_in_rub
         FROM dm.dm_account_balance_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
         WHERE EXTRACT(DAY FROM p_from_date::TIMESTAMP - on_date::TIMESTAMP) = 1
-            AND currency_code IN ('810', '643');
+            AND currency_code IN ('810', '643')
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(balance_out_rub)
+        SELECT COALESCE(SUM(balance_out_rub), 0)
         INTO p_balance_in_val
         FROM dm.dm_account_balance_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
         WHERE EXTRACT(DAY FROM p_from_date::TIMESTAMP - on_date::TIMESTAMP) = 1
-            AND currency_code NOT IN ('810', '643');
+            AND currency_code NOT IN ('810', '643')
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(balance_out_rub)
+        SELECT COALESCE(SUM(balance_out_rub), 0)
         INTO p_balance_in_total
         FROM dm.dm_account_balance_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
-        WHERE EXTRACT(DAY FROM p_from_date::TIMESTAMP - on_date::TIMESTAMP) = 1;
+        WHERE EXTRACT(DAY FROM p_from_date::TIMESTAMP - on_date::TIMESTAMP) = 1
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(debet_amount_rub)
+        SELECT COALESCE(SUM(debet_amount_rub), 0)
         INTO p_turn_deb_rub
         FROM dm.dm_account_turnover_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
         WHERE on_date BETWEEN p_from_date AND p_to_date
-            AND currency_code IN ('810', '643');
+            AND currency_code IN ('810', '643')
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(debet_amount_rub)
+        SELECT COALESCE(SUM(debet_amount_rub), 0)
         INTO p_turn_deb_val
         FROM dm.dm_account_turnover_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
         WHERE on_date BETWEEN p_from_date AND p_to_date
-            AND currency_code NOT IN ('810', '643');
+            AND currency_code NOT IN ('810', '643')
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(debet_amount_rub)
+        SELECT COALESCE(SUM(debet_amount_rub), 0)
         INTO p_turn_deb_total
         FROM dm.dm_account_turnover_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
-        WHERE on_date BETWEEN p_from_date AND p_to_date;
+        WHERE on_date BETWEEN p_from_date AND p_to_date
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(credit_amount_rub)
+        SELECT COALESCE(SUM(credit_amount_rub), 0)
         INTO p_turn_cre_rub
         FROM dm.dm_account_turnover_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
         WHERE on_date BETWEEN p_from_date AND p_to_date
-            AND currency_code IN ('810', '643');
+            AND currency_code IN ('810', '643')
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(credit_amount_rub)
+        SELECT COALESCE(SUM(credit_amount_rub), 0)
         INTO p_turn_cre_val
         FROM dm.dm_account_turnover_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
         WHERE on_date BETWEEN p_from_date AND p_to_date
-            AND currency_code NOT IN ('810', '643');
+            AND currency_code NOT IN ('810', '643')
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(credit_amount_rub)
+        SELECT COALESCE(SUM(credit_amount_rub), 0)
         INTO p_turn_cre_total
         FROM dm.dm_account_turnover_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
-        WHERE on_date BETWEEN p_from_date AND p_to_date;
+        WHERE on_date BETWEEN p_from_date AND p_to_date
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(balance_out_rub)
+        SELECT COALESCE(SUM(balance_out_rub), 0)
         INTO p_balance_out_rub
         FROM dm.dm_account_balance_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
-       WHERE on_date = p_to_date
-            AND currency_code IN ('810', '643');
+        WHERE on_date = p_to_date
+            AND currency_code IN ('810', '643')
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(balance_out_rub)
+        SELECT COALESCE(SUM(balance_out_rub), 0)
         INTO p_balance_out_val
         FROM dm.dm_account_balance_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
         WHERE on_date = p_to_date
-            AND currency_code NOT IN ('810', '643');
+            AND currency_code NOT IN ('810', '643')
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
-        SELECT SUM(balance_out_rub)
+        SELECT COALESCE(SUM(balance_out_rub), 0)
         INTO p_balance_out_total
         FROM dm.dm_account_balance_f AS da
         JOIN ds.md_account_d AS d ON da.account_rk = d.account_rk
-            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account
-        WHERE on_date = p_to_date;
+        WHERE on_date = p_to_date
+            AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
         
         INSERT INTO dm.dm_f101_round_f (
             from_date,
@@ -205,4 +205,3 @@ BEGIN
     CLOSE accounts_cur;
 END;
 $$
-
