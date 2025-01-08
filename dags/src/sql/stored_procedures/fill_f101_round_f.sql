@@ -29,6 +29,12 @@ DECLARE
 BEGIN
     OPEN accounts_cur;
 
+    INSERT INTO logs.logs_dm VALUES (
+        'INFO', 
+        NOW(), 
+        'Выполнение dm.fill_f101_round_f' 
+    );
+
     LOOP
         FETCH accounts_cur INTO p_ledger_account;
         EXIT WHEN NOT FOUND;
