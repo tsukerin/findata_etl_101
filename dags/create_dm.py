@@ -96,8 +96,8 @@ with DAG(
         op_args=[2018, 1, 31] 
     )
     
-    fill_account_balance_f = SQLExecuteQueryOperator(
-        task_id='create_fill_account_balance_f',
+    fill_f101_round_f = SQLExecuteQueryOperator(
+        task_id='fill_f101_round_f',
         conn_id='local-postgres',
         sql="CALL dm.fill_f101_round_f ('2018-02-01')",
     )
@@ -110,4 +110,4 @@ with DAG(
 
     dag_init >> start_task >> loading >> create_tables >> tables_created >> \
     loading2 >> create_fill_account_turnover_f >> create_fill_account_balance_f >> create_fill_f101_round_f >> stored_procedures_created >> \
-    fill_account_turnover_f >> fill_account_balance_f >> fill_account_balance_f >> end_task
+    fill_account_turnover_f >> fill_account_balance_f >> fill_f101_round_f >> end_task
