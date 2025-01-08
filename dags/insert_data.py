@@ -6,6 +6,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import time
 
+from src.utils.dm_funcs import insert_into_f101_round_f
 from src.utils.logging import *
 from src.utils.ds_funcs import *
 
@@ -91,10 +92,16 @@ with DAG(dag_id='insert_data',
         python_callable=insert_into_md_ledger_account_s
     )
 
+    f101_round_f = PythonOperator(
+        task_id="f101_round_f",
+        python_callable=insert_into_f101_round_f
+    )
+
     end_task = PythonOperator(
         task_id='end_task',
         python_callable=log_ds_notify,
         op_args=['SUCCESS', 'Загрузка данных успешно завершена!']
     )
 
-    dag_init >> start_task >> create_tables >> loading >> tables_created >> loading2 >> [ft_balance_f, ft_posting_f, md_account_d, md_currency_d, md_exchange_rate_d, md_ledger_account_s] >> end_task
+    dag_init >> start_task >> create_tables >> loading >> tables_created \
+    >> loading2 >> [ft_balance_f, ft_posting_f, md_account_d, md_currency_d, md_exchange_rate_d, md_ledger_account_s, f101_round_f] >> end_task

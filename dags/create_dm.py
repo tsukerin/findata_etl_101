@@ -72,6 +72,12 @@ with DAG(
         sql='sql/stored_procedures/fill_account_balance_f.sql',
     )
 
+    create_fill_f101_round_f = SQLExecuteQueryOperator(
+        task_id='create_fill_f101_round_f',
+        conn_id='local-postgres',
+        sql='sql/stored_procedures/fill_f101_round_f.sql',
+    )
+
     stored_procedures_created = PythonOperator(
         task_id='stored_procedures_created',
         python_callable=log_dm_notify,
@@ -89,6 +95,12 @@ with DAG(
         python_callable=exec_procedure_fill_account_balance_f,
         op_args=[2018, 1, 31] 
     )
+    
+    fill_account_balance_f = SQLExecuteQueryOperator(
+        task_id='create_fill_account_balance_f',
+        conn_id='local-postgres',
+        sql="CALL dm.fill_f101_round_f ('2018-02-01')",
+    )
 
     end_task = PythonOperator(
         task_id='end_task',
@@ -96,4 +108,6 @@ with DAG(
         op_args=['SUCCESS', 'Расчет витрин данных выполнен успешно!']
     )
 
-    dag_init >> start_task >> loading >> create_tables >> tables_created >> loading2 >> create_fill_account_turnover_f >> create_fill_account_balance_f >> stored_procedures_created >> fill_account_turnover_f >> fill_account_balance_f >> end_task
+    dag_init >> start_task >> loading >> create_tables >> tables_created >> \
+    loading2 >> create_fill_account_turnover_f >> create_fill_account_balance_f >> create_fill_f101_round_f >> stored_procedures_created >> \
+    fill_account_turnover_f >> fill_account_balance_f >> fill_account_balance_f >> end_task

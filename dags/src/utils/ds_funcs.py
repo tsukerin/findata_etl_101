@@ -272,3 +272,4 @@ def insert_into_md_ledger_account_s():
             conn.execute(f'DROP TABLE temp_md_ledger_account_s;')
     except Exception as e:
         log_ds_error('md_ledger_account_s', str(e))
+
