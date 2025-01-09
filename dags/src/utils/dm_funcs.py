@@ -98,15 +98,15 @@ def insert_into_f101_round_f():
         with engine.connect() as conn:
             conn.execute(
                 """
-                CREATE TEMP TABLE temp_dm_f101_round_f (LIKE dm.dm_f101_round_f);
+                CREATE TEMP TABLE temp_dm_f101_round_f_v2 (LIKE dm.dm_f101_round_f_v2);
                 """)
 
-            df.to_sql('temp_dm_f101_round_f', conn, if_exists='append', index=False)
+            df.to_sql('temp_dm_f101_round_f_v2', conn, if_exists='append', index=False)
 
             conn.execute(
                 """
-                MERGE INTO dm.dm_f101_round_f AS target
-                USING temp_dm_f101_round_f AS source
+                MERGE INTO dm.dm_f101_round_f_v2 AS target
+                USING temp_dm_f101_round_f_v2 AS source
                 ON target.from_date = source.from_date 
                     AND target.to_date = source.to_date
                     AND target.ledger_account = source.ledger_account
@@ -171,6 +171,6 @@ def insert_into_f101_round_f():
                         source.r_balance_out_total
                     );
                 """)
-            conn.execute(f'DROP TABLE temp_dm_f101_round_f;')
+            conn.execute(f'DROP TABLE temp_dm_f101_round_f_v2;')
     except Exception as e:
         log_ds_error('dm_f101_round_f', str(e))

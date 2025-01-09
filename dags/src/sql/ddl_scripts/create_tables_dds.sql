@@ -74,10 +74,10 @@ CREATE TABLE IF NOT EXISTS ds.md_ledger_account_s(
     is_correct VARCHAR(1)
 );
 
--- Создание таблицы dm_f101_round_f для импорта данных
+-- Создание таблицы dm_f101_round_f_v2 для импорта данных
 CREATE SCHEMA IF NOT EXISTS dm;
 
-CREATE TABLE IF NOT EXISTS dm.dm_f101_round_f (
+CREATE TABLE IF NOT EXISTS dm.dm_f101_round_f_v2 (
     from_date DATE,
     to_date DATE,
     chapter CHAR(1),
