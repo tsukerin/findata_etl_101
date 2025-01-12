@@ -29,6 +29,7 @@ DECLARE
 BEGIN
     OPEN accounts_cur;
 
+    -- Логирование в logs_dm
     INSERT INTO logs.logs_dm VALUES (
         'INFO', 
         NOW(), 
@@ -39,11 +40,13 @@ BEGIN
         FETCH accounts_cur INTO p_ledger_account;
         EXIT WHEN NOT FOUND;
 
+        -- Находим chapter по ledger_account
         SELECT chapter
         INTO p_chapter
         FROM ds.md_ledger_account_s
         WHERE ledger_account::VARCHAR = p_ledger_account;
 
+        -- В случае, если хоть один аккаунт не имеет такой характеристики, как у всех, присваивается статус "N"
         SELECT
             CASE 
                 WHEN COUNT(DISTINCT char_type) = 1 THEN MAX(char_type) 
@@ -53,6 +56,7 @@ BEGIN
         FROM ds.md_account_d
         WHERE SUBSTRING(account_number, 1, 5) = p_ledger_account;
 
+        -- Ищем суммы остатков в рублях
         SELECT COALESCE(SUM(balance_out_rub), 0)
         INTO p_balance_in_rub
         FROM dm.dm_account_balance_f AS da
@@ -76,6 +80,7 @@ BEGIN
         WHERE EXTRACT(DAY FROM p_from_date::TIMESTAMP - on_date::TIMESTAMP) = 1
             AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
+        -- Ищем суммы дебетовых оборотов
         SELECT COALESCE(SUM(debet_amount_rub), 0)
         INTO p_turn_deb_rub
         FROM dm.dm_account_turnover_f AS da
@@ -99,6 +104,7 @@ BEGIN
         WHERE on_date BETWEEN p_from_date AND p_to_date
             AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
+        -- Ищем суммы кредитных оборотов
         SELECT COALESCE(SUM(credit_amount_rub), 0)
         INTO p_turn_cre_rub
         FROM dm.dm_account_turnover_f AS da
@@ -122,6 +128,7 @@ BEGIN
         WHERE on_date BETWEEN p_from_date AND p_to_date
             AND SUBSTRING(d.account_number, 1, 5) = p_ledger_account;
 
+        -- Ищем суммы остатков в рублях
         SELECT COALESCE(SUM(balance_out_rub), 0)
         INTO p_balance_out_rub
         FROM dm.dm_account_balance_f AS da

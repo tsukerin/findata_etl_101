@@ -103,5 +103,13 @@ with DAG(dag_id='insert_data',
         op_args=['SUCCESS', 'Загрузка данных успешно завершена!']
     )
 
-    dag_init >> start_task >> create_tables >> loading >> tables_created \
-    >> loading2 >> [ft_balance_f, ft_posting_f, md_account_d, md_currency_d, md_exchange_rate_d, md_ledger_account_s, f101_round_f] >> end_task
+    (
+        dag_init >> 
+        start_task >> 
+        create_tables >> 
+        loading >> 
+        tables_created >> 
+        loading2 >> 
+        [ft_balance_f, ft_posting_f, md_account_d, md_currency_d, md_exchange_rate_d, md_ledger_account_s, f101_round_f] >> 
+        end_task
+    )
