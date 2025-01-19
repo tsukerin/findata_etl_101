@@ -21,4 +21,9 @@ pip install -r requirements.txt
 ```sh
 docker compose up
 ```
+- Перейдите по адресу `http://localhost:8080/`, чтобы продолжить работу с AirFlow 
+- Чтобы AirFlow увидел наши таблицы-источники, загрузите папку dags в docker контейнер:
+```sh
+docker cp ./dags project_assignment-airflow-worker-1
+```
 - Для расчета витрины запустите последовательно DAG'и `insert_data`, `create_dm` и `export_data`.
