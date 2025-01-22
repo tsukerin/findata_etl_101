@@ -12,6 +12,7 @@ git clone https://github.com/tsukerin/project_assignment.git \
 cd project_assignment
 ```
 - Перейдите в папку с проектом, создайте виртуальное окружение, активируйте его и установите зависимости:
+
 Win:
 ```sh
 python -m venv .venv \
